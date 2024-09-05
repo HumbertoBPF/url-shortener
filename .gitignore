@@ -1,0 +1,9 @@
+.venv
+.idea
+__pycache__
+# Database related files
+instance
+# Environment variables
+.env
+# Test coverage
+.coverage
