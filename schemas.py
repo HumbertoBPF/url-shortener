@@ -19,3 +19,7 @@ class UrlSchema(Schema):
     id = fields.Int()
     short_url = fields.Str()
     long_url = fields.Str()
+
+
+class UserSchema(Schema):
+    email = fields.Email()

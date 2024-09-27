@@ -21,6 +21,11 @@ def get_jwt_token_payload():
     return jwt.decode(token, SECRET_JWT, algorithms="HS256", verify=False)
 
 
+def get_token_payload():
+    token = get_jwt_token()
+    return jwt.decode(token, SECRET_JWT, algorithms="HS256", verify=True)
+
+
 def is_authenticated(wrapped_function):
     def decorator(*args, **kwargs):
         token = get_jwt_token()

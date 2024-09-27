@@ -1,5 +1,4 @@
 from flask import request, redirect
-from flask.views import MethodView
 from marshmallow import ValidationError
 from sqlalchemy import select
 
@@ -7,10 +6,12 @@ from database.config import db
 from database.models import User, Url
 from schemas import ShortenUrlSchema, UrlSchema
 from utils.authorization import is_authenticated, get_jwt_token_payload
+from utils.cors import MethodViewWithCors, cors
 from utils.url import shorten_url
 
 
-class UrlView(MethodView):
+class UrlView(MethodViewWithCors):
+    @cors
     @is_authenticated
     def post(self):
         try:
@@ -36,14 +37,15 @@ class UrlView(MethodView):
         db.session.commit()
 
         url_schema = UrlSchema()
-        response_body = url_schema.dumps(url)
+        response_body = url_schema.dump(url)
 
         db.session.close()
 
         return response_body, 201
 
 
-class RedirectView(MethodView):
+class RedirectView(MethodViewWithCors):
+    @cors
     @is_authenticated
     def get(self, short_url):
         token_payload = get_jwt_token_payload()
@@ -67,4 +69,3 @@ class RedirectView(MethodView):
         db.session.close()
 
         return redirect(redirect_url)
-

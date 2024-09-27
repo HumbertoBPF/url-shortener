@@ -1,15 +1,17 @@
 from flask import request
-from flask.views import MethodView
 from marshmallow import ValidationError
 from sqlalchemy import select
 
 from database.config import db
 from database.models import User
-from schemas import LoginSchema, SignupSchema
+from schemas import LoginSchema, SignupSchema, UserSchema
+from utils.authorization import get_token_payload, is_authenticated
+from utils.cors import MethodViewWithCors, cors
 from utils.hashing import hash_password
 
 
-class LoginView(MethodView):
+class LoginView(MethodViewWithCors):
+    @cors
     def post(self):
         schema = LoginSchema()
 
@@ -41,7 +43,8 @@ class LoginView(MethodView):
         }, 403
 
 
-class SignupView(MethodView):
+class SignupView(MethodViewWithCors):
+    @cors
     def post(self):
         schema = SignupSchema()
 
@@ -69,3 +72,20 @@ class SignupView(MethodView):
         db.session.commit()
 
         return "", 201
+
+
+class UserView(MethodViewWithCors):
+    @cors
+    @is_authenticated
+    def get(self):
+        token_payload = get_token_payload()
+        pk = token_payload["id"]
+
+        stmt = select(User).where(User.id == pk)
+        user = db.session.execute(stmt).first()
+
+        schema = UserSchema()
+        response_body = schema.dump(user[0])
+
+        db.session.close()
+        return response_body, 200
