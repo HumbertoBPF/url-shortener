@@ -11,8 +11,8 @@ from settings import SECRET_JWT
 
 class User(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    email: Mapped[str] = mapped_column(String, unique=True)
-    password: Mapped[str] = mapped_column(String)
+    email: Mapped[str] = mapped_column(String(256), unique=True)
+    password: Mapped[str] = mapped_column(String(256))
     urls: Mapped[List["Url"]] = relationship()
 
     def check_password(self, password: str) -> bool:
@@ -25,6 +25,6 @@ class User(db.Model):
 
 class Url(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    short_url: Mapped[str] = mapped_column(String, unique=True)
-    long_url: Mapped[str] = mapped_column(String)
+    short_url: Mapped[str] = mapped_column(String(256), unique=True)
+    long_url: Mapped[str] = mapped_column(String(1024))
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))

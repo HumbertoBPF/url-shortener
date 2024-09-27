@@ -3,13 +3,13 @@ from flask import Flask
 from database.config import db
 from services.urls import UrlView, RedirectView
 from services.users import LoginView, SignupView
-from settings import ENVIRONMENT
+from settings import ENVIRONMENT, DATABASE_URL
 
 
 def create_app():
     app = Flask(__name__)
 
-    uri = "sqlite+pysqlite:///:memory:" if ENVIRONMENT == "test" else "sqlite+pysqlite:///urlShortener.db"
+    uri = "sqlite+pysqlite:///:memory:" if ENVIRONMENT == "test" else DATABASE_URL
     app.config["SQLALCHEMY_DATABASE_URI"] = uri
     db.init_app(app)
 
