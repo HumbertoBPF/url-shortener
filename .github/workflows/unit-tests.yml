@@ -1,0 +1,26 @@
+name: Unit Tests
+run-name: ${{ github.actor }} is running unit tests
+on: workflow_dispatch
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies and run Pytest tests
+        run: |
+          pip install -r requirements.txt
+          
+          echo SECRET_JWT=${{ secrets.SECRET_JWT }} >> .env
+          echo ENVIRONMENT=${{ secrets.ENVIRONMENT }} >> .env
+          
+          echo DATABASE_USER=${{ secrets.DATABASE_USER }} >> .env
+          echo DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} >> .env
+          echo DATABASE_HOST=${{ secrets.DATABASE_HOST }} >> .env
+          echo DATABASE_PORT=${{ secrets.DATABASE_PORT }} >> .env
+          echo DATABASE_NAME=${{ secrets.DATABASE_NAME }} >> .env
+          
+          echo ACCESS_CONTROL_ALLOW_METHODS=${{ secrets.ACCESS_CONTROL_ALLOW_METHODS }} >> .env
+          echo ACCESS_CONTROL_ALLOW_HEADERS=${{ secrets.ACCESS_CONTROL_ALLOW_HEADERS }} >> .env
+          echo ACCESS_CONTROL_ALLOW_ORIGINS=${{ secrets.ACCESS_CONTROL_ALLOW_ORIGINS }} >> .env
+          
+          pytest . -n auto --cov
