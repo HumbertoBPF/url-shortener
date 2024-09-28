@@ -23,3 +23,4 @@ class UrlSchema(Schema):
 
 class UserSchema(Schema):
     email = fields.Email()
+    urls = fields.Nested(UrlSchema(), many=True)

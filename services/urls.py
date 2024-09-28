@@ -13,6 +13,34 @@ from utils.url import shorten_url
 class UrlView(MethodViewWithCors):
     @cors
     @is_authenticated
+    def delete(self, id):
+        token_payload = get_jwt_token_payload()
+        user_id = token_payload["id"]
+
+        url_stmt = select(
+            Url
+        ).where(
+            (Url.id == id) and (Url.user_id == user_id)
+        )
+
+        url = db.session.execute(url_stmt).first()
+
+        if url is None:
+            return {
+                "error": "Not found"
+            }, 404
+
+        db.session.delete(url[0])
+        db.session.commit()
+
+        db.session.close()
+
+        return "", 204
+
+
+class UrlShortenerView(MethodViewWithCors):
+    @cors
+    @is_authenticated
     def post(self):
         try:
             request_body = ShortenUrlSchema().load(request.json)
@@ -46,15 +74,11 @@ class UrlView(MethodViewWithCors):
 
 class RedirectView(MethodViewWithCors):
     @cors
-    @is_authenticated
     def get(self, short_url):
-        token_payload = get_jwt_token_payload()
-        user_id = token_payload["id"]
-
         url_stmt = select(
             Url.long_url
         ).where(
-            (Url.user_id == user_id) and (Url.short_url == short_url)
+            (Url.short_url == short_url)
         )
 
         result = db.session.execute(url_stmt).first()
